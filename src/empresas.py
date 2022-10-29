@@ -14,12 +14,22 @@ def buscar_categorias():
     # Abrindo a conexão com banco de dados
     db = conexao_pg()
     cursor = db.cursor()
-    sql = 'select * from categorias where processada = 0 limit 1'
+    sql = 'select * from categorias where processada = 0 order by id limit 10'
     cursor.execute(sql)
     consulta = cursor.fetchall()
     db.commit()
     db.close()
     return consulta
+
+
+def marcar_categoria_processada(id_categoria):
+    # Abrindo a conexão com banco de dados
+    db = conexao_pg()
+    cursor = db.cursor()
+    sql = f"update categorias set processada = 1 where id= {id_categoria}"
+    cursor.execute(sql)
+    db.commit()
+    db.close()
 
 
 def inserir_empresa(nome, url):
@@ -36,9 +46,10 @@ def buscar_empresas():
     categorias = buscar_categorias()
 
     for categoria in categorias:
-
+        id_categoria = categoria[0]
         pagina_buscar = 1
         while pagina_buscar != 0:
+
             empresas_encontradas = 0
             url_categoria = categoria[2] + f'?page={pagina_buscar}'
 
@@ -71,6 +82,7 @@ def buscar_empresas():
                 print(
                     f'Nenhuma empresa encontrada. Página {pagina_buscar}. Saindo...')
                 pagina_buscar = 0
+                marcar_categoria_processada(id_categoria)
             else:
                 pagina_buscar += 1
 
