@@ -15,3 +15,7 @@ create table empresas(
 	ig varchar(255),
 	url varchar(255)
 );
+
+--remover registros duplicados na tabela de empresas
+select * from empresas a
+where exists (select 1 from empresas b where a.nome = b.nome and a.id < b.id)
