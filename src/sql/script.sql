@@ -16,6 +16,11 @@ create table empresas(
 	url varchar(255)
 );
 
+--encontrando registros duplicados
+select nome, count(*) from empresas
+group by 1 having count(*) > 1
+order by nome
+
 --remover registros duplicados na tabela de empresas
 select * from empresas a
 where exists (select 1 from empresas b where a.nome = b.nome and a.id < b.id)
