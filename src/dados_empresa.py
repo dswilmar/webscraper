@@ -14,7 +14,7 @@ def buscar_empresas_processar():
     # Abrindo a conexão com banco de dados
     db = conexao_pg()
     cursor = db.cursor()
-    sql = "select id, nome, url from empresas where telefone is null order by id limit 10"
+    sql = "select id, nome, url from empresas where telefone='' order by id"
     cursor.execute(sql)
     consulta = cursor.fetchall()
     db.commit()
@@ -50,22 +50,27 @@ def buscar_dados_empresa():
         instagram = ""
 
         try:
-            div_endereco = driver.find_element(
-                "xpath", "/html/body/main/div[2]/section/div[1]/div[2]")
-            html_content = div_endereco.get_attribute('outerHTML')
-            soup = BeautifulSoup(html_content, 'html.parser')
-            soup.find("br").replaceWith(" - ")
-            p_endereco = soup.find_all("p", {"class": "text-md"})
-            endereco = p_endereco[0].text
             div_telefone = driver.find_element(
-                "xpath", "/html/body/main/div[2]/section/div[1]/div[2]/div")
+                "xpath", "/html/body/main/div[3]/section/div[1]/div[2]/div")
             content_telefone = div_telefone.get_attribute('outerHTML')
             soup_telefone = BeautifulSoup(content_telefone, 'html.parser')
             a_telefone = soup_telefone.find_all("a")
             telefone = str(a_telefone[0].get('href').replace("tel:", ""))
             anuncio_padrao = True
         except:
-            print("Ops! Endereco e telefone nao encontrados...")
+            print("Ops! Telefone nao encontrado")
+
+        try:
+            div_endereco = driver.find_element(
+                "xpath", "/html/body/main/div[3]/section/div[1]/div[2]")
+            html_content = div_endereco.get_attribute('outerHTML')
+            soup = BeautifulSoup(html_content, 'html.parser')
+            soup.find("br").replaceWith(" - ")
+            p_endereco = soup.find_all("p", {"class": "text-md"})
+            endereco = p_endereco[0].text
+            anuncio_padrao = True
+        except:
+            print("Ops! Endereco nao encontrado")
 
         try:
             if not anuncio_padrao:
